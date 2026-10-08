@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0e0c">
+  <title>Airspace — Live Flight Radar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <main class="radar-app" aria-label="Live flight radar">
+    <div id="map" role="application" aria-label="Interactive satellite map with live aircraft positions"></div>
+
+    <aside class="control-panel" id="control-panel" aria-label="Flight analytics and search">
+      <header class="panel-head">
+        <div class="brand">
+          <div class="brand-symbol" aria-hidden="true">⌁</div>
+          <div><div class="brand-name">AIRSPACE</div><div class="brand-sub">Live flight radar</div></div>
+        </div>
+        <button class="icon-button" id="toggle-panel" type="button" title="Collapse analytics panel" aria-label="Collapse analytics panel" aria-expanded="true">⟨</button>
+      </header>
+      <div class="panel-scroll">
+        <section class="section" aria-labelledby="analytics-title">
+          <h2 class="section-kicker" id="analytics-title"><span>Air traffic analytics</span><span class="live-label" id="connection" data-state="offline"><i class="live-dot"></i><span id="connection-label">Connecting</span></span></h2>
+          <div class="analytics">
+            <div class="metric"><span class="metric-label">Active planes in view</span><strong class="metric-value" id="active-count">—</strong><span class="metric-caption" id="visible-count">waiting for map</span></div>
+            <div class="metric"><span class="metric-label">Highest altitude</span><strong class="metric-value" id="altitude-value">—</strong><span class="metric-caption">aircraft in current view</span></div>
+          </div>
+        </section>
+        <section class="section">
+          <h2 class="section-kicker"><label for="callsign-search">Search flight callsign</label><span>ICAO / IATA</span></h2>
+          <form class="search-field" id="callsign-form" role="search">
+            <span aria-hidden="true">⌕</span>
+            <input id="callsign-search" type="search" placeholder="e.g. AAL100 · BAW27" autocomplete="off" spellcheck="false" aria-label="Search flight callsign">
+            <span class="search-hint">↵</span>
+          </form>
+        </section>
+        <section class="section">
+          <div class="list-head"><span>Aircraft in view</span><span id="tracked-count">0 tracked globally</span></div>
+          <div id="flight-list" aria-live="polite"><div class="list-empty">Waiting for aircraft data…</div></div>
+        </section>
+      </div>
+      <footer class="panel-foot"><span id="data-note">Connecting to OpenSky Network</span><span class="foot-clock" id="local-clock">--:--:--</span></footer>
+    </aside>
+
+    <header class="topbar" aria-label="Map controls">
+      <div class="topbar-left">
+        <span class="topbar-label">Coverage</span><strong class="topbar-value">GLOBAL AIRSPACE</strong>
+        <span class="top-separator"></span>
+        <span class="topbar-label">Imagery</span><span class="topbar-value">ESRI WORLD IMAGERY</span>
+      </div>
+      <div class="topbar-right">
+        <span class="connection-badge" id="top-connection" data-state="offline"><i class="live-dot"></i><span><span id="top-connection-label">OFFLINE</span> · <span id="last-update">awaiting signal</span></span></span>
+        <button class="hub-button" id="home-hub" type="button" title="Fly to New York JFK"><span class="hub-icon" aria-hidden="true">⌖</span><span>JFK HUB</span></button>
+      </div>
+    </header>
+
+    <div class="map-caption"><span>●</span> 3D LIVE AIRCRAFT <span id="tracked-map">0</span></div>
+
+    <aside class="flight-detail" id="flight-detail" role="dialog" aria-labelledby="detail-callsign" aria-hidden="true">
+      <header class="detail-head">
+        <div>
+          <div class="detail-kicker">Live flight profile</div>
+          <h2 id="detail-callsign">—</h2>
+          <div class="detail-origin"><span class="origin-mark"></span><span id="detail-origin">—</span></div>
+        </div>
+        <button class="detail-close" id="detail-close" type="button" aria-label="Close flight details">×</button>
+      </header>
+      <div class="detail-grid">
+        <div class="detail-cell"><span class="detail-label">Live altitude</span><strong class="detail-value" id="detail-altitude">—</strong></div>
+        <div class="detail-cell"><span class="detail-label">Ground speed</span><strong class="detail-value" id="detail-speed">—</strong></div>
+        <div class="detail-cell"><span class="detail-label">True track</span><strong class="detail-value" id="detail-track">—</strong></div>
+        <div class="detail-cell"><span class="detail-label">Squawk</span><strong class="detail-value" id="detail-squawk">—</strong></div>
+      </div>
+      <div class="detail-coordinates">
+        <div class="coordinate-row"><span>LATITUDE</span><strong id="detail-latitude">—</strong></div>
+        <div class="coordinate-row"><span>LONGITUDE</span><strong id="detail-longitude">—</strong></div>
+      </div>
+    </aside>
+  </main>
+</body>
+</html>
